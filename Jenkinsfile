@@ -26,6 +26,9 @@ pipeline {
         APP_VERSION  = sh(returnStdout: true,
                           script: "sed -n 's/^VERSION = \"\\(.*\\)\"\$/\\1/p' ACEest_Fitness.py").trim()
         IMAGE_TAG    = "${APP_VERSION}-${BUILD_NUMBER}"
+        // Parameters are undefined on a job's very first build, so fall back to defaults.
+        STRATEGY     = "${params.DEPLOY_STRATEGY ?: 'rolling'}"
+        CANARY_PCT   = "${params.CANARY_WEIGHT ?: '20'}"
     }
 
     options {
@@ -123,7 +126,7 @@ pipeline {
         }
 
         stage('Push to Docker Hub') {
-            when { expression { params.PUSH_IMAGE } }
+            when { expression { params.PUSH_IMAGE != false } }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                                                   usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
@@ -143,16 +146,16 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
-            when { expression { params.DEPLOY_STRATEGY != 'none' } }
+            when { expression { env.STRATEGY != 'none' } }
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh '''
                         chmod +x scripts/*.sh
                         kubectl get namespace aceest >/dev/null 2>&1 || scripts/deploy.sh init
-                        if [ "$DEPLOY_STRATEGY" = "canary" ]; then
-                            scripts/deploy.sh canary "$IMAGE_TAG" "$CANARY_WEIGHT"
+                        if [ "$STRATEGY" = "canary" ]; then
+                            scripts/deploy.sh canary "$IMAGE_TAG" "$CANARY_PCT"
                         else
-                            scripts/deploy.sh "$DEPLOY_STRATEGY" "$IMAGE_TAG"
+                            scripts/deploy.sh "$STRATEGY" "$IMAGE_TAG"
                         fi
                         kubectl -n aceest get deploy,svc,ingress -o wide
                     '''
@@ -162,7 +165,7 @@ pipeline {
                 failure {
                     // deploy.sh already reverted to the last stable version (rollout undo /
                     // colour kept / canary weight 0); use scripts/rollback.sh for manual rollback.
-                    echo "Deployment failed; last stable version kept/restored for ${params.DEPLOY_STRATEGY}."
+                    echo "Deployment failed; last stable version kept/restored for ${env.STRATEGY}."
                 }
             }
         }
