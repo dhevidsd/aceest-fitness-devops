@@ -1,6 +1,6 @@
 # ACEest Fitness & Gym — CI/CD Project
 
-[![CI/CD Pipeline](https://github.com/dhevidsd/aceest-fitness-cicd/actions/workflows/main.yml/badge.svg)](https://github.com/dhevidsd/aceest-fitness-cicd/actions/workflows/main.yml)
+[![CI/CD Pipeline](https://github.com/dhevidsd/aceest-fitness-devops/actions/workflows/main.yml/badge.svg)](https://github.com/dhevidsd/aceest-fitness-devops/actions/workflows/main.yml)
 
 A Flask web application for **ACEest Fitness & Gym** management, delivered with a
 fully automated CI/CD pipeline using **Pytest**, **SonarQube**, **Docker / Docker Hub**,
@@ -51,8 +51,8 @@ Every version exposes `GET /version` (version, deployment track, pod hostname) a
 ## Local Setup & Execution
 
 ```bash
-git clone https://github.com/dhevidsd/aceest-fitness-cicd.git
-cd aceest-fitness-cicd
+git clone https://github.com/dhevidsd/aceest-fitness-devops.git
+cd aceest-fitness-devops
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt

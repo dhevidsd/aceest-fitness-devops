@@ -2,7 +2,7 @@
 
 **Student:** DHEVI SHREE D S (BITS ID 2025TM93120)  
 **Course:** Introduction to DevOps (CSIZG514/SEZG514) — Assignment 2  
-**Repository:** https://github.com/dhevidsd/aceest-fitness-cicd  
+**Repository:** https://github.com/dhevidsd/aceest-fitness-devops  
 **Container registry:** https://hub.docker.com/r/dhevishreeds/aceest-fitness
 
 ## 1. CI/CD Architecture Overview
